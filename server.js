@@ -18,7 +18,7 @@ const db = mysql.createConnection(
     user: "root",
     // TODO: Add MySQL password here
     password: "Password1",
-    database: "movies_db",
+    database: "employee_tracker_db"
   },
   console.log(`Connected to the employee database.`)
 );
@@ -28,13 +28,15 @@ promptUser().then((answer) => {
   console.log(userSelect);
   switch (userSelect) {
     case "View All Departments":
-      showDepartments();
+      selectDepartments();
       break;
+    case "View all Managers":
+      selectManagers();
   }
 });
 
-function showDepartments() {
-  db.query("SELECT * FROM departments", function (err, results) {
+function selectDepartments() {
+  db.query(`SELECT * FROM departments`, function (err, results) {
     console.log(results);
   });
 }
