@@ -1,10 +1,6 @@
-SELECT
-  employees.first_name AS first, employees.last_name AS last, 
-FROM favorite_books
-JOIN book_prices ON favorite_books.book_price = book_prices.id;
-
-SELECT
-  favorite_books.book_name AS name, book_prices.price AS price
-FROM favorite_books
-JOIN book_prices ON favorite_books.book_price = book_prices.id;
-
+-- SELECT 
+--   employees.first_name AS first, employees.last_name AS last, 
+--   departments.department_name AS department_name, roles.title AS role_name
+-- FROM employees
+-- JOIN departments ON employees.department_id = departments.id
+-- JOIN roles ON employees.role_id = roles.id
