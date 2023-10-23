@@ -7,6 +7,7 @@ function promptUser() {
       message: "What would you like to do?",
       name: "userSelect",
       choices: [
+        "View all Managers",
         "View All Employees",
         "Add Employee",
         "Update Employee Role",
