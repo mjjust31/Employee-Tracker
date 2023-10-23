@@ -36,3 +36,8 @@ View all Roles
 View all departments
 Add department
 quit
+
+
+
+Things to fix: 
+1. Need to fix the relationship between manager and employee
