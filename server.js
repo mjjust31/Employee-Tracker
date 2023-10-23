@@ -29,14 +29,21 @@ promptUser().then((answer) => {
   switch (userSelect) {
     case "View All Departments":
       selectDepartments();
+      promptUser(); 
       break;
     case "View all Managers":
       selectManagers();
+      promptUser(); 
   }
 });
 
 function selectDepartments() {
   db.query(`SELECT * FROM departments`, function (err, results) {
-    console.log(results);
+    console.table(results);
   });
 }
+
+function selectManagers(){
+  db.query(`SELECT * FROM managers`, function (err, results) {
+    console.table(results);
+})}
