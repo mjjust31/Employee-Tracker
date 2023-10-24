@@ -7,19 +7,21 @@ function promptUser() {
       message: "What would you like to do?",
       name: "userSelect",
       choices: [
+        "View All Departments",
         "View all Managers",
         "View All Employees",
-        "Add Employee",
-        "Update Employee Role",
         "View All Roles",
         "Add Role",
-        "View All Departments",
         "Add Department",
+        "Add Employee",
+        "Update Employee Role",
         "Quit",
       ],
-      default: "View All Employees",
+      default: "View All Departments",
     },
   ]);
 }
 
 module.exports = promptUser; 
+
+

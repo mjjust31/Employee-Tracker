@@ -11,12 +11,12 @@ VALUES ('Sales Lead', 100000, true, 4),
   ('Account Manger', 160000, true, 2),
   ('Accountant', 125000, false, 2),
   ('Legal Team Lead', 250000, true, 3),
-  ('Laywer', 190000, false, 3);
+  ('Lawyer', 190000, false, 3);
 INSERT INTO managers (full_Name, title, department)
 VALUES ('John Doe', 1, 4),
   ('Ashley Rodriguez', 3, 1),
   ('Kunal Singh', 5, 2),
-  ('Sara Lourd', 7, 4);
+  ('Sara Lourd', 7, 3);
 INSERT INTO employees (
     first_name,
     last_name,

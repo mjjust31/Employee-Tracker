@@ -24,30 +24,33 @@ const db = mysql.createConnection(
   console.log(`Connected to the employee database.`)
 );
 
-promptUser().then((answer) => {
-  const { userSelect } = answer;
-  console.log(userSelect);
-  switch (userSelect) {
-    case "View All Departments":
-      viewDepartments();
-      break;
-    case "View all Managers":
-      viewManagers();
-      break;
-    case "View All Roles":
-      viewRoles();
-      break;
-    case "View All Employees":
-      viewEmployees();
-      break;
-    case "Add Department":
-      addDepartment();
-      break;
-    case "Add Role":
-      addRole();
-      break;
-  }
-});
+function init() {
+  promptUser().then((answer) => {
+    const { userSelect } = answer;
+    console.log(userSelect);
+    switch (userSelect) {
+      case "View All Departments":
+        viewDepartments();
+        break;
+      case "View all Managers":
+        viewManagers();
+        break;
+      case "View All Roles":
+        viewRoles();
+        break;
+      case "View All Employees":
+        viewEmployees();
+        break;
+      case "Add Department":
+        addDepartment();
+        break;
+      case "Add Role":
+        addRole();
+        break;
+    }
+    init();
+  });
+}
 
 function viewDepartments() {
   db.query(`SELECT * FROM departments`, function (err, results) {
@@ -56,15 +59,24 @@ function viewDepartments() {
 }
 
 function viewManagers() {
-  db.query(`SELECT * FROM managers`, function (err, results) {
-    console.table(results);
-  });
+  db.query(
+    `SELECT managers.full_name AS Full_Name, titles.title AS Title, departments.department_name AS department 
+    FROM managers 
+    JOIN titles ON managers.title = titles.id 
+    JOIN departments ON managers.department = departments.id`,
+    function (err, results) {
+      console.table(results);
+    }
+  );
 }
 
 function viewRoles() {
-  db.query(`SELECT * FROM titles`, function (err, results) {
-    console.table(results);
-  });
+  db.query(
+    `SELECT * FROM titles JOIN departments ON titles.department = departments.id `,
+    function (err, results) {
+      console.table(results);
+    }
+  );
 }
 
 function viewEmployees() {
@@ -124,7 +136,8 @@ function addRole() {
           name: "salary",
           validate: function (input) {
             const done = this.async();
-            if (input === NaN || input.length === 0) { //NaN not working as expected. review later
+            if (input === NaN || input.length === 0) {
+              //NaN not working as expected. review later
               done("You need to provide a numerical salary.");
               return;
             }
@@ -143,3 +156,5 @@ function addRole() {
       });
   });
 }
+
+init();

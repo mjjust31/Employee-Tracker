@@ -13,6 +13,7 @@ CREATE TABLE titles (
   department INT NOT NULL,
   FOREIGN KEY (department) REFERENCES departments(id)
 );
+
 CREATE TABLE managers (
   id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
   full_Name VARCHAR(30) NOT NULL,
@@ -21,6 +22,7 @@ CREATE TABLE managers (
   FOREIGN KEY (title) REFERENCES titles(id),
   FOREIGN KEY (department) REFERENCES departments(id)
 );
+
 CREATE TABLE employees (
   id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
   first_name VARCHAR(30) NOT NULL,
@@ -32,3 +34,4 @@ CREATE TABLE employees (
   FOREIGN KEY (department) REFERENCES departments(id),
   FOREIGN KEY (managerName) REFERENCES managers(id)
 );
+
