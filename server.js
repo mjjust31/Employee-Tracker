@@ -39,8 +39,13 @@ promptUser().then((answer) => {
       break;
     case "View All Employees":
       viewEmployees();
+      break;
     case "Add Department":
       addDepartment();
+      break;
+    case "Add Role":
+      addRole();
+      break;
   }
 });
 
@@ -81,7 +86,7 @@ function addDepartment() {
       const { newDepartment } = answers;
       db.query(
         `INSERT INTO departments SET ?`,
-        {department_name: newDepartment },
+        { department_name: newDepartment },
         (err, result) => {
           if (err) {
             console.log("Error adding department:", err);
@@ -94,4 +99,47 @@ function addDepartment() {
     .catch((error) => {
       console.log("Error:", error);
     });
+}
+
+function addRole() {
+  db.query(`SELECT * FROM departments`, function (err, results) {
+    console.table(results);
+
+    inquirer
+      .prompt([
+        {
+          type: "input",
+          message: "What is the job title?",
+          name: "title",
+        },
+        {
+          type: "list",
+          message: "What departement does this role belong to?",
+          name: "department",
+          choices: results.map((departments) => departments.department_name), //needs to be an an array from the table
+        },
+        {
+          type: "input",
+          message: "What is the salary for this position?",
+          name: "salary",
+          validate: function (input) {
+            const done = this.async();
+            if (input === NaN || input.length === 0) { //NaN not working as expected. review later
+              done("You need to provide a numerical salary.");
+              return;
+            }
+            done(null, true);
+          },
+        },
+        {
+          type: "list",
+          message: "Ist this a manager role?",
+          name: "isItManager",
+          choices: ["Yes", "No"],
+        },
+      ])
+      .then((answers) => {
+        console.log(answers);
+      });
+  });
 }
