@@ -41,3 +41,6 @@ quit
 
 Things to fix: 
 1. Need to fix the relationship between manager and employee
+
+https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/isNaN
+
