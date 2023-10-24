@@ -30,20 +30,17 @@ promptUser().then((answer) => {
   switch (userSelect) {
     case "View All Departments":
       viewDepartments();
-      promptUser();
       break;
     case "View all Managers":
       viewManagers();
-      promptUser();
+      break;
     case "View All Roles":
       viewRoles();
-      promptUser();
+      break;
     case "View All Employees":
       viewEmployees();
-      promptUser();
     case "Add Department":
       addDepartment();
-    // promptUser();
   }
 });
 
@@ -60,7 +57,7 @@ function viewManagers() {
 }
 
 function viewRoles() {
-  db.query(`SELECT * FROM roles`, function (err, results) {
+  db.query(`SELECT * FROM titles`, function (err, results) {
     console.table(results);
   });
 }
@@ -77,14 +74,14 @@ function addDepartment() {
       {
         type: "input",
         message: "What is the name of the department?",
-        name: "department_name",
+        name: "newDepartment",
       },
     ])
     .then((answers) => {
-      const { department_name } = answers;
+      const { newDepartment } = answers;
       db.query(
         `INSERT INTO departments SET ?`,
-        { department_name },
+        {department_name: newDepartment },
         (err, result) => {
           if (err) {
             console.log("Error adding department:", err);

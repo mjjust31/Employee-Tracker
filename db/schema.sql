@@ -5,29 +5,30 @@ CREATE TABLE departments (
   id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
   department_name VARCHAR(30) NOT NULL
 );
-CREATE TABLE roles (
+CREATE TABLE titles (
   id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
   title VARCHAR(30) NOT NULL,
-  manager BOOLEAN,
-  department_id INT NOT NULL,
-  FOREIGN KEY (department_id) REFERENCES departments(id)
+  salary INT NOT NULL,
+  isItManager BOOLEAN,
+  department INT NOT NULL,
+  FOREIGN KEY (department) REFERENCES departments(id)
 );
 CREATE TABLE managers (
   id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
   full_Name VARCHAR(30) NOT NULL,
-  role_id INT NOT NULL,
-  manager BOOLEAN,
-  department_id INT NOT NULL,
-  FOREIGN KEY (role_id) REFERENCES roles(id)
+  title INT NOT NULL,
+  department INT NOT NULL,
+  FOREIGN KEY (title) REFERENCES titles(id),
+  FOREIGN KEY (department) REFERENCES departments(id)
 );
 CREATE TABLE employees (
   id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
   first_name VARCHAR(30) NOT NULL,
   last_name VARCHAR(30) NOT NULL,
-  role_id INT NOT NULL,
-  department_id INT NOT NULL,
-  salary INT NOT NULL,
-  manager_id INT,
-  FOREIGN KEY (role_id) REFERENCES roles(id),
-  FOREIGN KEY (manager_id) REFERENCES managers(id)
+  title INT NOT NULL,
+  department INT NOT NULL,
+  managerName INT,
+  FOREIGN KEY (title) REFERENCES titles(id),
+  FOREIGN KEY (department) REFERENCES departments(id),
+  FOREIGN KEY (managerName) REFERENCES managers(id)
 );
