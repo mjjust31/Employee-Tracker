@@ -221,8 +221,51 @@ function addRole() {
 function addEmployee() {
   db.query(`SELECT * FROM employees`, function (err, results) {
     console.table(results);
+    inquirer
+      .prompt([
+        {
+          type: "input",
+          message: "What is the employee's first name?",
+          name: "firstName",
+          validate: function (input) {
+            const done = this.async();
+            if (input.length === 0) {
+              done("You need to enter a job title.");
+              return;
+            }
+            done(null, true);
+          },
+        },
+        {
+          type: "input",
+          message: "What is the employee's last name",
+          name: "lastName",
+        },
+        {
+          type: "list",
+          message: "What is the employee's title",
+          name: "employeeTitle",
+          choices: results.map((title) => title.title),
+        },
+        {
+          type: "list",
+          messsage: "What is the employees's department?",
+          name: "employeeDepartment",
+          choices: results.map((department) => department.department),
+        },
+        {
+          type: "list",
+          messsage: "Who is the employee's manager?",
+          name: "manager",
+          choices: results.map((manager) => manager.managerName),
+        },
+      ])
+      .then((answers) => {
+        console.log(answers);
+      });
   });
 }
+
 // function UpdateEmployeeRole(){
 // }
 
