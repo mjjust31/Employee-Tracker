@@ -302,11 +302,9 @@ function UpdateEmployeeRole() {
           name: "department",
           choices: results.map((department) => department.department),
         },
-
       ])
       .then((answers) => {
         const { id, title, department } = answers;
-
 
         db.query(
           `UPDATE employees SET title = ?, department = ?  WHERE id = ?`,
