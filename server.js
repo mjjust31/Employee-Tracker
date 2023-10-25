@@ -69,7 +69,7 @@ function viewDepartments() {
 
 function viewManagers() {
   db.query(
-    `SELECT managers.full_name AS Full_Name, titles.title AS Title, departments.department_name AS department 
+    `SELECT managers.id AS id, managers.Manager_Name AS Manager_Name, titles.title AS Title, departments.department_name AS department 
     FROM managers 
     JOIN titles ON managers.title = titles.id 
     JOIN departments ON managers.department = departments.id`,
@@ -92,12 +92,12 @@ function viewEmployees() {
   const employeeQuery = `SELECT employees.first_name AS First_Name,
   employees.last_name AS Last_Name,
   titles.title AS Title,
-  departments.department_name AS Department,
-  managers.full_Name AS Manager_Name
+  departments.department AS Department,
+  managers.Manager_Name AS Manager_Name
   FROM employees
   JOIN titles ON employees.title = titles.id
   JOIN departments ON employees.department = departments.id
-  LEFT JOIN managers ON employees.managerName = managers.id;
+  LEFT JOIN managers ON employees.Manager_Name = managers.id;
 `;
 
   db.query(employeeQuery, function (err, results) {
@@ -128,7 +128,7 @@ function addDepartment() {
       const { newDepartment } = answers;
       db.query(
         `INSERT INTO departments SET ?`,
-        { department_name: newDepartment },
+        { department: newDepartment },
         (err, result) => {
           if (err) {
             console.log("Error adding department:", err);
@@ -225,6 +225,7 @@ function addRole() {
 function addEmployee() {
   db.query(`SELECT * FROM employees`, function (err, results) {
     console.table(results);
+
     inquirer
       .prompt([
         {
@@ -257,15 +258,36 @@ function addEmployee() {
           name: "employeeDepartment",
           choices: results.map((department) => department.department),
         },
-        {
-          type: "list",
-          messsage: "Who is the employee's manager?",
-          name: "manager",
-          choices: results.map((manager) => manager.managerName),
-        },
       ])
       .then((answers) => {
-        console.log(answers);
+        const {
+          firstName,
+          lastName,
+          employeeTitle,
+          employeeDepartment,
+          Manager_Name,
+        } = answers;
+
+        const addUser = {
+          first_name: firstName,
+          last_name: lastName,
+          title: employeeTitle,
+          department: employeeDepartment,
+          Manager_Name: Manager_Name,
+        };
+
+        db.query(`INSERT INTO employees SET ?`, addUser, (err, result) => {
+          if (err) {
+            console.log("Error adding role:", err);
+          } else {
+            console.log("Employee added successfully!");
+          }
+        });
+      })
+      .catch((error) => {
+        console.log("Error:", error);
+
+        // console.log(userEntryRole)
       });
   });
 }

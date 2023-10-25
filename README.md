@@ -37,10 +37,18 @@ View all departments
 Add department
 quit
 
+## Install
+    "express": "^4.17.1",
+    "inquirer": "^8.2.4",
+    "jshint": "^2.12.0",
+    "mysql2": "^2.2.5"
+
 
 
 Things to fix: 
 1. Need to fix the relationship between manager and employee
+2. Try to query and researched Promises to map the current list of choices by text instead of ID when adding a new employee (for the manager role). 
+3. When adding init() to the switch case, it didn't run smoothly for finishing the add department, role, and employees functions, so it was removed. 
 
 https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/isNaN
 
