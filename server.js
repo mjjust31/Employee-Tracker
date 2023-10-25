@@ -53,6 +53,7 @@ function init() {
       case "Update Employee Role":
         break;
       case "Quit":
+        quit();
         break;
     }
   });
@@ -269,8 +270,8 @@ function addEmployee() {
 // function UpdateEmployeeRole(){
 // }
 
-// function quit(){
-
-// }
+function quit(){
+  process.exit();
+}
 
 init();
