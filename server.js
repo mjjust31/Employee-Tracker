@@ -1,6 +1,6 @@
 const promptUser = require("./script/prompt");
-const fs = require("fs");
-const path = require("path");
+// const fs = require("fs");
+// const path = require("path");
 const express = require("express");
 const mysql = require("mysql2");
 const PORT = process.env.PORT || 3001;
@@ -51,11 +51,13 @@ function init() {
         addEmployee();
         break;
       case "Update Employee Role":
+        UpdateEmployeeRole();
         break;
       case "Quit":
         quit();
         break;
     }
+    // init();
   });
 }
 
@@ -105,7 +107,8 @@ function viewEmployees() {
 
 function addDepartment() {
   console.log("Inside function");
-  return inquirer
+
+  inquirer
     .prompt([
       {
         type: "input",
@@ -267,10 +270,63 @@ function addEmployee() {
   });
 }
 
-// function UpdateEmployeeRole(){
-// }
+function UpdateEmployeeRole() {
+  db.query(`SELECT * FROM employees`, function (err, results) {
+    console.table(results);
+    inquirer
+      .prompt([
+        {
+          type: "list",
+          message:
+            "What is the id of the employee you want to select a title change for?",
+          name: "id",
+          choices: results.map((id) => id.id),
+          validate: function (input) {
+            const done = this.async();
+            if (input.length === 0) {
+              done("You need to enter an id.");
+              return;
+            }
+            done(null, true);
+          },
+        },
+        {
+          type: "list",
+          message: "Please select the new title for this person",
+          name: "title",
+          choices: results.map((title) => title.title),
+        },
+        {
+          type: "list",
+          message: "Please select the new department for this person",
+          name: "department",
+          choices: results.map((department) => department.department),
+        },
 
-function quit(){
+      ])
+      .then((answers) => {
+        const { id, title, department } = answers;
+
+
+        db.query(
+          `UPDATE employees SET title = ?, department = ?  WHERE id = ?`,
+          [title, department, id],
+          (err, result) => {
+            if (err) {
+              console.log("Error adding role:", err);
+            } else {
+              console.log("update added successfully!");
+            }
+          }
+        );
+      })
+      .catch((error) => {
+        console.log("Error:", error);
+      });
+  });
+}
+
+function quit() {
   process.exit();
 }
 
