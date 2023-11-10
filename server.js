@@ -277,89 +277,61 @@ function addEmployee() {
   db.query(`SELECT * FROM titles`, function (err, titles) {
     console.table(titles);
 
-    inquirer
-      .prompt([
-        {
-          type: "input",
-          message: "What is the employee's first name?",
-          name: "firstName",
-          validate: function (input) {
-            const done = this.async();
-            if (input.length === 0) {
-              done("You need to enter a first name.");
-              return;
-            }
-            done(null, true);
-          },
-        },
-        {
-          type: "input",
-          message: "What is the employee's last name?",
-          name: "lastName",
-          validate: function (input) {
-            const done = this.async();
-            if (input.length === 0) {
-              done("You need to enter a last name.");
-              return;
-            }
-            done(null, true);
-          },
-        },
-        {
-          type: "list",
-          message: "Please select the employee's title",
-          name: "employeeTitle",
-          choices: titles.map((title) => title.title),
-        },
-      ])
-      .then((answers) => {
-        const { firstName, lastName, employeeTitle } = answers;
-
-        db.query(
-          `SELECT titles.title, departments.department_name
-  FROM titles
-  JOIN departments ON departments.id = titles.department_name`,
-          function (err, results) {
-            if (err) {
-              console.error(err);
-              return;
-            }
-
-            const findDepartment = results.find(
-              (department) => department.title === employeeTitle
-            );
-
-            if (findDepartment) {
-              console.log(
-                "Selected department:",
-                findDepartment.department_name
-              );
-            } else {
-              console.log("Department not found");
-            }
-
-            db.query(
-              `SELECT departments.department_name, managers.manager_name, managers.id
-              FROM titles
-              JOIN departments ON titles.department_name = departments.id
-              JOIN managers ON titles.id = managers.title`,
-              function (err, managers) {
-                if (err) {
-                  console.log(err);
-                  return;
-                }
-
-                const findManager = managers.find(
-                  (manager) =>
-                    manager.department_name === findDepartment.department_name
-                );
-
-                console.log(findManager.id);
+    db.query(`SELECT * FROM departments`, function (err, departments) {
+      inquirer
+        .prompt([
+          {
+            type: "input",
+            message: "What is the employee's first name?",
+            name: "firstName",
+            validate: function (input) {
+              const done = this.async();
+              if (input.length === 0) {
+                done("You need to enter a first name.");
+                return;
               }
-            );
-          }
-        );
-      });
+              done(null, true);
+            },
+          },
+          {
+            type: "input",
+            message: "What is the employee's last name?",
+            name: "lastName",
+            validate: function (input) {
+              const done = this.async();
+              if (input.length === 0) {
+                done("You need to enter a last name.");
+                return;
+              }
+              done(null, true);
+            },
+          },
+          {
+            type: "list",
+            message: "Please select the employee's title",
+            name: "employeeTitle",
+            choices: titles.map((title) => title.title),
+          },
+        ])
+        .then((answers) => {
+          const { firstName, lastName, employeeTitle } = answers;
+          console.log(employeeTitle);
+
+          const selectedTitle = titles.find(
+            (title) => title.title === employeeTitle
+          );
+          console.log(selectedTitle);
+          const titleId = selectedTitle.id;
+          console.log(titleId);
+
+          const selectedDepartment = departments.find(
+            (department) => department.id === selectedTitle.department_name
+          );
+          console.log(selectedDepartment);
+          const departmentId = selectedDepartment.id; 
+          console.log(departmentId)
+        });
+    });
   });
 }
 init();

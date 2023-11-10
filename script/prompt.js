@@ -18,7 +18,7 @@ function promptUser() {
         "Update Employee Role",
         "Quit",
       ],
-      default: "View All Departments",
+      default: "Add Employee",
     },
   ]);
 }
