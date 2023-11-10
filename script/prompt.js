@@ -14,6 +14,7 @@ function promptUser() {
         "Add Role",
         "Add Department",
         "Add Employee",
+        "Add Manager",
         "Update Employee Role",
         "Quit",
       ],
@@ -22,6 +23,4 @@ function promptUser() {
   ]);
 }
 
-module.exports = promptUser; 
-
-
+module.exports = promptUser;

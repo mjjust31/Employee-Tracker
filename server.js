@@ -1,6 +1,4 @@
 const promptUser = require("./script/prompt");
-// const fs = require("fs");
-// const path = require("path");
 const express = require("express");
 const mysql = require("mysql2");
 const PORT = process.env.PORT || 3001;
@@ -11,13 +9,10 @@ const inquirer = require("inquirer");
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
-// Connect to database
 const db = mysql.createConnection(
   {
     host: "127.0.0.1",
-    // MySQL username,
     user: "root",
-    // TODO: Add MySQL password here
     password: "Password1",
     database: "employee_tracker_db",
   },
@@ -32,79 +27,55 @@ function init() {
       case "View All Departments":
         viewDepartments();
         break;
-      case "View all Managers":
-        viewManagers();
-        break;
+
       case "View All Roles":
         viewRoles();
         break;
+
       case "View All Employees":
         viewEmployees();
         break;
+
+      case "View all Managers":
+        viewManagers();
+        break;
+
       case "Add Department":
         addDepartment();
         break;
+
+      case "Add Department":
+        addDepartment();
+        break;
+
       case "Add Role":
         addRole();
+        break;
+
+      case "Add Manager":
+        addManager();
         break;
       case "Add Employee":
         addEmployee();
         break;
-      case "Update Employee Role":
-        UpdateEmployeeRole();
-        break;
-      case "Quit":
-        quit();
-        break;
+
+      //   break;
+      // case "Update Employee Role":
+      //   UpdateEmployeeRole();
+
+      //   break;
+      // case "Quit":
+      //   quit();
+      //   break;
     }
-    // init();
   });
 }
-
 function viewDepartments() {
-  db.query(`SELECT * FROM departments`, function (err, results) {
+  db.query(`SELECT department_name from departments`, function (err, results) {
     console.table(results);
   });
+  init();
 }
-
-function viewManagers() {
-  db.query(
-    `SELECT managers.id AS id, managers.Manager_Name AS Manager_Name, titles.title AS Title, departments.department_name AS department 
-    FROM managers 
-    JOIN titles ON managers.title = titles.id 
-    JOIN departments ON managers.department = departments.id`,
-    function (err, results) {
-      console.table(results);
-    }
-  );
-}
-
-function viewRoles() {
-  db.query(
-    `SELECT * FROM titles JOIN departments ON titles.department = departments.id `,
-    function (err, results) {
-      console.table(results);
-    }
-  );
-}
-
-function viewEmployees() {
-  const employeeQuery = `SELECT employees.first_name AS First_Name,
-  employees.last_name AS Last_Name,
-  titles.title AS Title,
-  departments.department AS Department,
-  managers.Manager_Name AS Manager_Name
-  FROM employees
-  JOIN titles ON employees.title = titles.id
-  JOIN departments ON employees.department = departments.id
-  LEFT JOIN managers ON employees.Manager_Name = managers.id;
-`;
-
-  db.query(employeeQuery, function (err, results) {
-    console.table(results);
-  });
-}
-
 function addDepartment() {
   console.log("Inside function");
 
@@ -128,7 +99,7 @@ function addDepartment() {
       const { newDepartment } = answers;
       db.query(
         `INSERT INTO departments SET ?`,
-        { department: newDepartment },
+        { department_name: newDepartment },
         (err, result) => {
           if (err) {
             console.log("Error adding department:", err);
@@ -142,10 +113,26 @@ function addDepartment() {
       console.log("Error:", error);
     });
 }
-
-function addRole() {
-  db.query(`SELECT * FROM departments`, function (err, results) {
+function viewManagers() {
+  const managersq = `SELECT managers.manager_name, titles.title, departments.department_name
+  FROM managers
+  JOIN titles ON managers.title = titles.id
+  JOIN departments ON titles.department_name = departments.id`;
+  db.query(managersq, function (err, results) {
     console.table(results);
+  });
+}
+function viewRoles() {
+  db.query(
+    `select title, salary, isItManager, departments.department_name from titles join departments on departments.id = titles.department_name order by title`,
+    function (err, results) {
+      console.table(results);
+    }
+  );
+}
+function addRole() {
+  db.query(`SELECT * FROM departments`, function (err, departments) {
+    console.table(departments);
 
     inquirer
       .prompt([
@@ -185,9 +172,9 @@ function addRole() {
         },
         {
           type: "list",
-          message: "What departement does this role belong to?",
+          message: "What department does this role belong to?",
           name: "department",
-          choices: results.map((departments) => departments.id),
+          choices: departments.map((department) => department.department_name),
           //needs to be an an array from the table
         },
       ])
@@ -195,159 +182,140 @@ function addRole() {
         // console.log(answers);
         const { title, salary, isItManager, department } = answers;
 
-        const userRawEntryRole = {
+        const departmentId = departments.find(
+          (dept) => dept.department_name === department
+        ).id;
+
+        console.log(departmentId);
+
+        const newRole = {
           title: title,
           salary: salary,
           isItManager: isItManager,
-          department: department,
+          department_name: departmentId,
         };
 
-        db.query(
-          `INSERT INTO titles SET ?`,
-          userRawEntryRole,
-          (err, result) => {
-            if (err) {
-              console.log("Error adding role:", err);
-            } else {
-              console.log("Title added successfully!");
-            }
-          }
-        );
-      })
-      .catch((error) => {
-        console.log("Error:", error);
-
-        // console.log(userEntryRole)
-      });
-  });
-}
-
-function addEmployee() {
-  db.query(`SELECT * FROM employees`, function (err, results) {
-    console.table(results);
-
-    inquirer
-      .prompt([
-        {
-          type: "input",
-          message: "What is the employee's first name?",
-          name: "firstName",
-          validate: function (input) {
-            const done = this.async();
-            if (input.length === 0) {
-              done("You need to enter a job title.");
-              return;
-            }
-            done(null, true);
-          },
-        },
-        {
-          type: "input",
-          message: "What is the employee's last name",
-          name: "lastName",
-        },
-        {
-          type: "list",
-          message: "What is the employee's title",
-          name: "employeeTitle",
-          choices: results.map((title) => title.title),
-        },
-        {
-          type: "list",
-          messsage: "What is the employees's department?",
-          name: "employeeDepartment",
-          choices: results.map((department) => department.department),
-        },
-      ])
-      .then((answers) => {
-        const {
-          firstName,
-          lastName,
-          employeeTitle,
-          employeeDepartment,
-          Manager_Name,
-        } = answers;
-
-        const addUser = {
-          first_name: firstName,
-          last_name: lastName,
-          title: employeeTitle,
-          department: employeeDepartment,
-          Manager_Name: Manager_Name,
-        };
-
-        db.query(`INSERT INTO employees SET ?`, addUser, (err, result) => {
+        db.query(`INSERT INTO titles SET ?`, newRole, (err, result) => {
           if (err) {
             console.log("Error adding role:", err);
           } else {
-            console.log("Employee added successfully!");
+            console.log("Title added successfully!");
           }
         });
       })
       .catch((error) => {
         console.log("Error:", error);
-
-        // console.log(userEntryRole)
       });
   });
 }
+function addManager() {
+  db.query(
+    `select * from titles where isItManager = 1`,
+    function (err, titles) {
+      console.table(titles);
 
-function UpdateEmployeeRole() {
-  db.query(`SELECT * FROM employees`, function (err, results) {
+      db.query(`select * from departments`, function (err, departments) {
+        console.table(departments);
+
+        inquirer
+          .prompt([
+            {
+              type: "input",
+              message: "What is the full name of the manager?",
+              name: "manager_name",
+            },
+            {
+              type: "list",
+              message: "What is their title?",
+              name: "manager_title",
+              choices: titles.map((title) => title.title),
+            },
+          ])
+          .then((answers) => {
+            console.log(answers);
+            const { manager_name, manager_title } = answers;
+            const findTitleId = titles.find(
+              (titles) => titles.title === manager_title
+            ).id;
+            console.log(findTitleId);
+            const newManager = {
+              manager_name: manager_name,
+              title: findTitleId,
+            };
+            db.query(
+              "INSERT INTO managers SET ?",
+              newManager,
+              function (err, results) {
+                if (err) {
+                  console.log("Failed to enter new manager");
+                } else {
+                  console.log("Manager added successfully!");
+                }
+              }
+            );
+          })
+          .catch((error) => {
+            console.log("Error:", error);
+          });
+      });
+    }
+  );
+}
+function viewEmployees() {
+  const employeesquery = `Select employees.last_name, employees.first_name, titles.title, titles.salary, titles.isItManager, departments.department_name, managers.manager_name from employees 
+  join titles on titles.id = employees.title
+  Join departments on departments.id = titles.department_name
+  Left join managers on managers.id = employees.manager_name
+  Order by employees.last_name`;
+
+  db.query(employeesquery, function (err, results) {
     console.table(results);
-    inquirer
-      .prompt([
-        {
-          type: "list",
-          message:
-            "What is the id of the employee you want to select a title change for?",
-          name: "id",
-          choices: results.map((id) => id.id),
-          validate: function (input) {
-            const done = this.async();
-            if (input.length === 0) {
-              done("You need to enter an id.");
-              return;
-            }
-            done(null, true);
-          },
-        },
-        {
-          type: "list",
-          message: "Please select the new title for this person",
-          name: "title",
-          choices: results.map((title) => title.title),
-        },
-        {
-          type: "list",
-          message: "Please select the new department for this person",
-          name: "department",
-          choices: results.map((department) => department.department),
-        },
-      ])
-      .then((answers) => {
-        const { id, title, department } = answers;
-
-        db.query(
-          `UPDATE employees SET title = ?, department = ?  WHERE id = ?`,
-          [title, department, id],
-          (err, result) => {
-            if (err) {
-              console.log("Error adding role:", err);
-            } else {
-              console.log("update added successfully!");
-            }
-          }
-        );
-      })
-      .catch((error) => {
-        console.log("Error:", error);
-      });
   });
 }
+function addEmployee() {
+  //map title name
+  //map manager_name can i tie the manager name to title's department? look at promise reject resolve
+  db.query(`SELECT * FROM titles`, function (err, titles) {
 
-function quit() {
-  process.exit();
+    
+    console.table(titles);
+    inquirer.prompt([
+      {
+        type: "input",
+        message: "What is the employees first name?",
+        name: "firstName",
+        validate: function (input) {
+          const done = this.async();
+          if (input.length === 0) {
+            done("You need to enter a first name.");
+            return;
+          }
+          done(null, true);
+        },
+      },
+      {
+        type: "input",
+        message: "What is the employees last name?",
+        name: "lastName",
+        validate: function (input) {
+          const done = this.async();
+          if (input.length === 0) {
+            done("You need to enter a last name.");
+            return;
+          }
+          done(null, true);
+        },
+      },
+      {
+        type: "list",
+        message: "Please select the employees title",
+        name: "employeeTitle",
+        choices: titles.map((titles) => 
+          titles.title
+        ),
+      },
+    ]);
+  });
 }
 
 init();
