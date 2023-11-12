@@ -275,77 +275,78 @@ function viewEmployees() {
 }
 function addEmployee() {
   db.query(`SELECT * FROM titles`, function (err, titles) {
-    console.table(titles);
+    // console.table(titles);
 
     db.query(`SELECT * FROM departments`, function (err, departments) {
-      // Fetch managers data from the database
-      db.query(`SELECT * FROM managers`, function (err, managers) {
-        inquirer
-          .prompt([
-            {
-              type: "input",
-              message: "What is the employee's first name?",
-              name: "firstName",
-              validate: function (input) {
-                const done = this.async();
-                if (input.length === 0) {
-                  done("You need to enter a first name.");
-                  return;
-                }
-                done(null, true);
+      db.query(
+        `SELECT managers.manager_name, managers.id, titles.title, departments.department_name FROM managers 
+        JOIN titles on titles.id = managers.title
+        JOIN departments on departments.id = titles.department_name `,
+        function (err, managers) {
+          console.table(managers);
+
+          inquirer
+            .prompt([
+              {
+                type: "input",
+                message: "What is the employee's first name?",
+                name: "firstName",
+                validate: function (input) {
+                  const done = this.async();
+                  if (input.length === 0) {
+                    done("You need to enter a first name.");
+                    return;
+                  }
+                  done(null, true);
+                },
               },
-            },
-            {
-              type: "input",
-              message: "What is the employee's last name?",
-              name: "lastName",
-              validate: function (input) {
-                const done = this.async();
-                if (input.length === 0) {
-                  done("You need to enter a last name.");
-                  return;
-                }
-                done(null, true);
+              {
+                type: "input",
+                message: "What is the employee's last name?",
+                name: "lastName",
+                validate: function (input) {
+                  const done = this.async();
+                  if (input.length === 0) {
+                    done("You need to enter a last name.");
+                    return;
+                  }
+                  done(null, true);
+                },
               },
-            },
-            {
-              type: "list",
-              message: "Please select the employee's title",
-              name: "employeeTitle",
-              choices: titles.map((title) => title.title),
-            },
-          ])
-          .then((answers) => {
-            const { firstName, lastName, employeeTitle } = answers;
+              {
+                type: "list",
+                message: "Please select the employee's title",
+                name: "employeeTitle",
+                choices: titles.map((title) => title.title),
+              },
+              {
+                type: "list",
+                message: "Please confirm this employee's manager",
+                name: "managerName",
+                choices: [
+                  "NULL",
+                  ...managers.map((manager) => manager.manager_name),
+                ],
+              },
+            ])
+            .then((answers) => {
+              const { firstName, lastName, employeeTitle, managerName } =
+                answers;
 
-            const selectedTitle = titles.find(
-              (title) => title.title === employeeTitle
-            );
-            console.log(selectedTitle);
-            const titleId = selectedTitle.id;
-            console.log(titleId);
+              const selectedTitle = titles.find(
+                (title) => title.title === employeeTitle
+              );
+              console.log(selectedTitle);
+              const titleId = selectedTitle.id;
+              console.log(titleId);
 
-            const selectedDepartment = departments.find((department) => department.department_name === selectedTitle.department_name);
-            console.log(selectedDepartment);
-            const departmentId = selectedDepartment.id;
-            console.log(departmentId);
-            // const selectedManager = managers.find(
-            //   (manager) => manager.title === titleId
-            // );
-            // console.log(selectedManager);
-            // const managerId = selectedManager.id;
-            // console.log(managerId);
-
-            // const newEmployee = {
-            //   first_name: firstName,
-            //   last_name: lastName,
-            //   title: titleId,
-            //   manager_name: managerId
-            // }
-
-            // console.log(newEmployee)
-          });
-      });
+              const selectedManager = managers.find(
+                (manager) => manager.manager_name === managerName
+              );
+              console.log(selectedManager);
+            });
+        }
+      );
     });
   });
 }
